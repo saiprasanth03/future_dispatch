@@ -84,12 +84,11 @@ export const runInstagramPublishing = async () => {
     const pendingPosts = await Post.find({ status: 'generated' });
 
     for (const post of pendingPosts) {
-      // In a real environment, the image URLs must be PUBLICLY accessible by Facebook's servers.
-      // For this local simulation, we'll assume we have a public URL proxy (like ngrok) or we upload to S3 first.
-      // Here, we just pass mock URLs since we are likely in simulation mode without real IG tokens.
-      const mockPublicUrls = post.slidesText.map((_, idx) => `https://via.placeholder.com/1080x1350?text=Slide+${idx+1}`);
+      // Use the live Render URL so Facebook can download the real generated images!
+      const baseUrl = process.env.RENDER_EXTERNAL_URL || 'https://future-dispatch.onrender.com';
+      const livePublicUrls = post.slidesText.map((_, idx) => `${baseUrl}/output/${post._id}/slide_${idx+1}.png`);
 
-      const result = await publishToInstagram(mockPublicUrls, post.caption);
+      const result = await publishToInstagram(livePublicUrls, post.caption);
       
       post.status = result.success ? 'published' : 'failed';
       post.instagramPostId = result.postId;
