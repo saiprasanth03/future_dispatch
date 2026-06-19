@@ -84,9 +84,17 @@ export const runInstagramPublishing = async () => {
     const pendingPosts = await Post.find({ status: 'generated' });
 
     for (const post of pendingPosts) {
-      // Use the live Render URL so Facebook can download the real generated images!
-      const baseUrl = process.env.RENDER_EXTERNAL_URL || 'https://future-dispatch.onrender.com';
-      const livePublicUrls = post.slidesText.map((_, idx) => `${baseUrl}/output/${post._id}/slide_${idx+1}.png`);
+      const outputDir = path.resolve(process.cwd(), 'output', post._id.toString());
+      const localImagePaths = await generateImagesForPost({ slides: post.slidesText }, outputDir);
+
+      // Upload images to public temporary host so Facebook can read them
+      console.log('Uploading generated images to temporary public host for Facebook...');
+      const { uploadImage } = await import('./imageUploader.js');
+      const livePublicUrls = [];
+      for (const imgPath of localImagePaths) {
+        const url = await uploadImage(imgPath);
+        livePublicUrls.push(url);
+      }
 
       const result = await publishToInstagram(livePublicUrls, post.caption);
       
