@@ -15,6 +15,7 @@ export const generateImagesForPost = async (postData, outputDir) => {
     const browser = await puppeteer.launch({
       headless: "new",
       defaultViewport: { width: 1080, height: 1350 }, // Instagram portrait size
+      args: ['--no-sandbox', '--disable-setuid-sandbox'], // Required for Render/Linux
     });
     
     const page = await browser.newPage();
