@@ -16,11 +16,9 @@ export const filterAndGenerateContent = async (articles) => {
       return generateMockPosts(articles.slice(0, 5));
     }
 
-    // Use Groq for 100% free AI generation!
-    const openai = new OpenAI({ 
-      apiKey: apiKey,
-      baseURL: 'https://api.groq.com/openai/v1'
-    });
+    // Use Google Gemini API
+    const { GoogleGenAI } = await import('@google/genai');
+    const ai = new GoogleGenAI({ apiKey: apiKey });
 
     const systemPrompt = `
 You are an expert AI media company editor with 50+ years of creative experience.
@@ -58,17 +56,17 @@ Output JSON EXACTLY in this schema:
 
     const userPrompt = `Here are the latest AI articles:\n\n${articles.map((a, i) => `[${i}] ${a.title}\n${a.summary}`).join('\n\n')}`;
 
-    const response = await openai.chat.completions.create({
-      model: 'mixtral-8x7b-32768', // Fast, high-quality, completely FREE model on Groq
-      messages: [
-        { role: 'system', content: systemPrompt },
-        { role: 'user', content: userPrompt }
-      ],
-      response_format: { type: "json_object" },
-      temperature: 0.7,
+    const response = await ai.models.generateContent({
+      model: 'gemini-2.5-flash',
+      contents: userPrompt,
+      config: {
+        systemInstruction: systemPrompt,
+        responseMimeType: "application/json",
+        temperature: 0.7,
+      }
     });
 
-    const parsedResponse = JSON.parse(response.choices[0].message.content);
+    const parsedResponse = JSON.parse(response.text);
     return parsedResponse.topPosts;
 
   } catch (error) {
