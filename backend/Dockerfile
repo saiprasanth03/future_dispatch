@@ -8,7 +8,7 @@ WORKDIR /usr/src/app
 
 # Set Puppeteer environment variables to use the pre-installed Chrome
 ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true \
-    PUPPETEER_EXECUTABLE_PATH=/usr/bin/google-chrome-stable
+    PUPPETEER_EXECUTABLE_PATH=/usr/bin/google-chrome
 
 # Install app dependencies
 # A wildcard is used to ensure both package.json AND package-lock.json are copied
