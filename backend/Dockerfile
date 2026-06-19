@@ -6,9 +6,8 @@ USER root
 # Create app directory
 WORKDIR /usr/src/app
 
-# Set Puppeteer environment variables to use the pre-installed Chrome
-ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true \
-    PUPPETEER_EXECUTABLE_PATH=/usr/bin/google-chrome
+# No need to set executable path, Puppeteer Docker image knows where it is!
+
 
 # Install app dependencies
 # A wildcard is used to ensure both package.json AND package-lock.json are copied
